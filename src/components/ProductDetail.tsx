@@ -44,7 +44,8 @@ export default function ProductDetail({ product, isLoading, onBack }: ProductDet
   const [shippingMethod, setShippingMethod] = useState<'air' | 'sea'>('air');
   const [addingToWishlist, setAddingToWishlist] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [domesticShippingFee, setDomesticShippingFee] = useState<number | null>(null);
+  const [domesticShippingFirst, setDomesticShippingFirst] = useState<number | null>(null);
+  const [domesticShippingNext, setDomesticShippingNext] = useState<number | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [checkoutData, setCheckoutData] = useState<any>(null);
   const { user } = useAuth();
