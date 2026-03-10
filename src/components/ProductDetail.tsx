@@ -717,12 +717,16 @@ export default function ProductDetail({ product, isLoading, onBack }: ProductDet
                     <span className="text-base font-bold">৳{totalSelectedPrice.toLocaleString()}</span>
                   </div>
 
-                  {domesticShippingFee != null && domesticShippingFee > 0 && (
-                    <div className="flex items-center justify-between bg-muted/40 rounded-lg px-3 py-2">
-                      <span className="text-sm text-muted-foreground flex items-center gap-1.5"><Truck className="h-3.5 w-3.5" />China Courier (1688)</span>
-                      <span className="text-sm font-semibold">৳{convertToBDT(domesticShippingFee).toLocaleString()}</span>
-                    </div>
-                  )}
+                  {domesticShippingFirst != null && domesticShippingFirst > 0 && (() => {
+                    const qty = totalSelectedQty || 1;
+                    const totalCNY = domesticShippingFirst + (qty > 1 ? (qty - 1) * (domesticShippingNext ?? domesticShippingFirst) : 0);
+                    return (
+                      <div className="flex items-center justify-between bg-muted/40 rounded-lg px-3 py-2">
+                        <span className="text-sm text-muted-foreground flex items-center gap-1.5"><Truck className="h-3.5 w-3.5" />China Courier (1688)</span>
+                        <span className="text-sm font-semibold">৳{convertToBDT(totalCNY).toLocaleString()}</span>
+                      </div>
+                    );
+                  })()}
 
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-foreground">Pay now <Badge variant="secondary" className="text-xs ml-1.5 py-0.5 px-1.5">70%</Badge></span>
