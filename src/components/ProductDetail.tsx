@@ -736,7 +736,7 @@ export default function ProductDetail({ product, isLoading, onBack }: ProductDet
                     <span className="text-sm text-foreground">Pay on delivery <Badge variant="secondary" className="text-xs ml-1.5 py-0.5 px-1.5">30%</Badge></span>
                     <span className="text-sm font-bold">৳{Math.round(totalSelectedPrice * 0.3).toLocaleString()} +</span>
                   </div>
-                  <p className="text-xs text-primary font-medium cursor-pointer hover:underline">Shipping + China Courier Charge</p>
+                  <p className="text-xs text-muted-foreground">চায়না লোকাল ডেলিভারি চার্জ কার্ট পেজে যোগ হবে</p>
 
                   {/* Approximate Weight */}
                   {product.item_weight && (
