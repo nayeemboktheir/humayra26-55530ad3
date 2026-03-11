@@ -46,6 +46,7 @@ export default function ProductDetail({ product, isLoading, onBack }: ProductDet
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [domesticShippingFirst, setDomesticShippingFirst] = useState<number | null>(null);
   const [domesticShippingNext, setDomesticShippingNext] = useState<number | null>(null);
+  const [domesticShippingLoading, setDomesticShippingLoading] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [checkoutData, setCheckoutData] = useState<any>(null);
   const { user } = useAuth();
