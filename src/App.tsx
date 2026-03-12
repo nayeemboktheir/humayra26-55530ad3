@@ -21,6 +21,7 @@ const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const ReturnRefundPolicy = lazy(() => import("./pages/ReturnRefundPolicy"));
 const ProhibitedItems = lazy(() => import("./pages/ProhibitedItems"));
 const SellerStore = lazy(() => import("./pages/SellerStore"));
+const PaymentCallback = lazy(() => import("./pages/PaymentCallback"));
 
 // Dashboard pages
 const DashboardLayout = lazy(() => import("./components/dashboard/DashboardLayout"));
@@ -106,6 +107,7 @@ const App = () => (
               <Route path="/install" element={<Install />} />
               <Route path="/seller/:vendorId" element={<SellerStore />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/payment/callback" element={<PaymentCallback />} />
               <Route path="/dashboard" element={<DashboardRoute><Overview /></DashboardRoute>} />
               <Route path="/dashboard/orders" element={<DashboardRoute><Orders /></DashboardRoute>} />
               <Route path="/dashboard/delivery" element={<DashboardRoute><Delivery /></DashboardRoute>} />
