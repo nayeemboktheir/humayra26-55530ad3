@@ -70,8 +70,8 @@ export default function PaymentCallback() {
 
         {status === "success" && (
           <>
-            <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto" />
-            <h1 className="text-xl font-bold text-green-600">পেমেন্ট সফল হয়েছে!</h1>
+            <CheckCircle2 className="h-16 w-16 text-primary mx-auto" />
+            <h1 className="text-xl font-bold text-primary">পেমেন্ট সফল হয়েছে!</h1>
             {orderNumber && (
               <p className="text-muted-foreground">
                 অর্ডার নম্বর: <span className="font-semibold text-foreground">{orderNumber}</span>
