@@ -198,7 +198,7 @@ export default function ProductDetail({ product, isLoading, onBack }: ProductDet
       totalPrice,
       domesticShippingFeeBDT: domesticChargeBDT,
       sellerName: product.seller_info?.shop_name,
-      onConfirm: async (opts: { deliveryOption: string; address: string; note: string }) => {
+      onConfirm: async (opts: { deliveryOption: string; address: string; note: string; paymentOption: string }) => {
         const unitPrice = totalQty > 0 ? Math.round(totalPrice / totalQty) : 0;
         const orderNumber = `HT-${Date.now().toString(36).toUpperCase()}`;
 
@@ -213,7 +213,6 @@ export default function ProductDetail({ product, isLoading, onBack }: ProductDet
           variantId = selectedSkus.map(sku => sku.id).join(', ');
         }
 
-        // Add delivery info to notes
         const deliveryInfo = `\n[Delivery: ${opts.deliveryOption === 'courier' ? 'By Courier' : 'Warehouse Pickup'}]`;
         if (opts.deliveryOption === 'courier' && opts.address) {
           notes += `${deliveryInfo}\n[Address: ${opts.address}]`;
@@ -224,6 +223,11 @@ export default function ProductDetail({ product, isLoading, onBack }: ProductDet
         const productUrl = `${window.location.origin}/?product=${product.num_iid}`;
         const sourceUrl = `https://detail.1688.com/offer/${product.num_iid}.html`;
 
+        const grandTotal = totalPrice + domesticChargeBDT;
+        const payableAmount = opts.paymentOption === 'partial' ? Math.round(grandTotal * 0.7) : grandTotal;
+        const invoiceNumber = `PS-${Date.now()}`;
+
+        // Create order with awaiting_payment status
         const { error } = await supabase.from('orders').insert({
           user_id: user!.id,
           order_number: orderNumber,
@@ -239,12 +243,41 @@ export default function ProductDetail({ product, isLoading, onBack }: ProductDet
           variant_name: variantName || null,
           variant_id: variantId || null,
           product_1688_id: String(product.num_iid),
+          status: 'awaiting_payment',
+          payment_status: 'unpaid',
+          payment_amount: payableAmount,
+          payment_invoice: invoiceNumber,
         } as any);
 
         if (error) throw error;
 
-        toast({ title: "Order placed!", description: `Order ${orderNumber} has been created successfully.` });
-        navigate("/dashboard/orders");
+        // Get user email for PayStation
+        const userEmail = user!.email || 'customer@example.com';
+
+        // Call PayStation init payment
+        const callbackUrl = `${window.location.origin}/payment/callback`;
+
+        const { data: psData, error: psError } = await supabase.functions.invoke('paystation-init-payment', {
+          body: {
+            invoice_number: invoiceNumber,
+            payment_amount: payableAmount,
+            cust_name: opts.address ? opts.address.split('\n')[0] : (user!.user_metadata?.full_name || 'Customer'),
+            cust_phone: '01700000000',
+            cust_email: userEmail,
+            cust_address: opts.address || 'N/A',
+            callback_url: callbackUrl,
+            checkout_items: JSON.stringify({ order_number: orderNumber, product: product.title, qty: totalQty }),
+            reference: orderNumber,
+          },
+        });
+
+        if (psError || !psData?.success) {
+          toast({ title: "পেমেন্ট শুরু করা যায়নি", description: psData?.error || "অনুগ্রহ করে আবার চেষ্টা করুন।", variant: "destructive" });
+          return;
+        }
+
+        // Redirect to PayStation checkout
+        window.location.href = psData.payment_url;
       },
     });
     setCheckoutOpen(true);
