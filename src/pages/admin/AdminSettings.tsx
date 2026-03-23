@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
-import { Settings, DollarSign, Loader2, Save, CheckCircle, Globe, Image, Phone, Mail, MapPin, Type, Send, FileText, Footprints } from "lucide-react";
+import { Settings, DollarSign, Loader2, Save, CheckCircle, Globe, Image, Phone, Mail, MapPin, Type, Send, FileText, Footprints, MessageSquare } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 
 type SettingsMap = Record<string, string>;
@@ -21,6 +21,7 @@ const settingsKeys = [
   "invoice_company_email", "invoice_company_website", "invoice_footer_text",
   "footer_copyright_text", "footer_developer_name", "footer_developer_url",
   "footer_prohibited_title", "footer_prohibited_text",
+  "bulksms_bd_api_key", "bulksms_bd_sender_id",
 ];
 
 const tabs = [
@@ -30,6 +31,7 @@ const tabs = [
   { id: "currency", label: "Currency", icon: DollarSign },
   { id: "email", label: "Email", icon: Send },
   { id: "invoice", label: "Invoice", icon: FileText },
+  { id: "sms", label: "SMS", icon: MessageSquare },
 ] as const;
 
 type TabId = typeof tabs[number]["id"];
@@ -282,6 +284,22 @@ export default function AdminSettings() {
               <Field label="Company Email">{inp("invoice_company_email", "info@tradeon.global")}</Field>
               <Field label="Company Address" span={2}>{inp("invoice_company_address", "House 16, Road 07, Nikunja-02, Dhaka")}</Field>
               <Field label="Footer Text" span={2}>{inp("invoice_footer_text", "Thank you for shopping with us!")}</Field>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* SMS */}
+      {activeTab === "sms" && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-sm"><MessageSquare className="h-4 w-4 text-primary" /> SMS Gateway (BulkSMS BD)</CardTitle>
+            <p className="text-xs text-muted-foreground">Configure BulkSMS BD API credentials for OTP-based mobile login.</p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
+              <Field label="API Key" span={2} hint="bulksmsbd.net dashboard থেকে API Key কপি করুন">{inp("bulksms_bd_api_key", "Your BulkSMS BD API Key")}</Field>
+              <Field label="Sender ID" hint="Approved Sender ID (e.g. 8809617618686)">{inp("bulksms_bd_sender_id", "8809617618686")}</Field>
             </div>
           </CardContent>
         </Card>
