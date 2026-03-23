@@ -31,6 +31,7 @@ const tabs = [
   { id: "currency", label: "Currency", icon: DollarSign },
   { id: "email", label: "Email", icon: Send },
   { id: "invoice", label: "Invoice", icon: FileText },
+  { id: "sms", label: "SMS", icon: MessageSquare },
 ] as const;
 
 type TabId = typeof tabs[number]["id"];
