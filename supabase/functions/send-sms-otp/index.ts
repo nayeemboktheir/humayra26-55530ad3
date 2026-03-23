@@ -31,6 +31,10 @@ serve(async (req) => {
       normalizedPhone = "880" + normalizedPhone;
     }
 
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
     // Read SMS config from app_settings
     const { data: smsSettings } = await supabase
       .from("app_settings")
@@ -46,10 +50,6 @@ serve(async (req) => {
     }
 
     const BULKSMS_SENDER_ID = smsMap.bulksms_bd_sender_id || "8809617618686";
-
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Generate 6-digit OTP
     const otp = String(Math.floor(100000 + Math.random() * 900000));
