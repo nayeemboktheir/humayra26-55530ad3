@@ -21,6 +21,7 @@ const settingsKeys = [
   "invoice_company_email", "invoice_company_website", "invoice_footer_text",
   "footer_copyright_text", "footer_developer_name", "footer_developer_url",
   "footer_prohibited_title", "footer_prohibited_text",
+  "bulksms_bd_api_key", "bulksms_bd_sender_id",
 ];
 
 const tabs = [
