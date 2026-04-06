@@ -68,6 +68,63 @@ export type Database = {
         }
         Relationships: []
       }
+      cart_items: {
+        Row: {
+          created_at: string
+          domestic_shipping_fee: number | null
+          id: string
+          product_id: string
+          product_image: string | null
+          product_name: string
+          product_url: string | null
+          quantity: number
+          seller_name: string | null
+          sku_details: Json | null
+          source_url: string | null
+          unit_price: number
+          updated_at: string
+          user_id: string
+          variant_id: string | null
+          variant_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          domestic_shipping_fee?: number | null
+          id?: string
+          product_id: string
+          product_image?: string | null
+          product_name: string
+          product_url?: string | null
+          quantity?: number
+          seller_name?: string | null
+          sku_details?: Json | null
+          source_url?: string | null
+          unit_price?: number
+          updated_at?: string
+          user_id: string
+          variant_id?: string | null
+          variant_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          domestic_shipping_fee?: number | null
+          id?: string
+          product_id?: string
+          product_image?: string | null
+          product_name?: string
+          product_url?: string | null
+          quantity?: number
+          seller_name?: string | null
+          sku_details?: Json | null
+          source_url?: string | null
+          unit_price?: number
+          updated_at?: string
+          user_id?: string
+          variant_id?: string | null
+          variant_name?: string | null
+        }
+        Relationships: []
+      }
       category_products: {
         Row: {
           category_query: string

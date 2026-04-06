@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { CartProvider } from "@/contexts/CartContext";
 import { useAdmin } from "@/hooks/useAdmin";
 import { Loader2 } from "lucide-react";
 import PageLoader from "@/components/PageLoader";
@@ -39,6 +40,7 @@ const Withdrawal = lazy(() => import("./pages/dashboard/Withdrawal"));
 const Transactions = lazy(() => import("./pages/dashboard/Transactions"));
 const Refunds = lazy(() => import("./pages/dashboard/Refunds"));
 const Profile = lazy(() => import("./pages/dashboard/Profile"));
+const Cart = lazy(() => import("./pages/dashboard/Cart"));
 
 // Admin pages
 const AdminLayout = lazy(() => import("./components/admin/AdminLayout"));
@@ -95,6 +97,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <CartProvider>
           <TrackingScripts />
           <Suspense fallback={<PageLoader />}>
             <Routes>
@@ -122,6 +125,7 @@ const App = () => (
               <Route path="/dashboard/transactions" element={<DashboardRoute><Transactions /></DashboardRoute>} />
               <Route path="/dashboard/refunds" element={<DashboardRoute><Refunds /></DashboardRoute>} />
               <Route path="/dashboard/profile" element={<DashboardRoute><Profile /></DashboardRoute>} />
+              <Route path="/dashboard/cart" element={<DashboardRoute><Cart /></DashboardRoute>} />
               <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
               <Route path="/admin/orders" element={<AdminRoute><AdminOrders /></AdminRoute>} />
               <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
@@ -140,6 +144,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
+        </CartProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

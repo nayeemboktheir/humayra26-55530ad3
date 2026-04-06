@@ -20,6 +20,7 @@ import { ProductDetail1688 } from "@/lib/api/alibaba1688";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useCart } from "@/contexts/CartContext";
 
 import { convertToBDT } from "@/lib/currency";
 import CheckoutDialog from "@/components/CheckoutDialog";
@@ -50,6 +51,8 @@ export default function ProductDetail({ product, isLoading, onBack }: ProductDet
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [checkoutData, setCheckoutData] = useState<any>(null);
   const { user } = useAuth();
+  const { addToCart } = useCart();
+  const [addingToCart, setAddingToCart] = useState(false);
   const navigate = useNavigate();
 
   // Fetch 1688 domestic shipping fee – try multiple provinces on failure
@@ -142,6 +145,58 @@ export default function ProductDetail({ product, isLoading, onBack }: ProductDet
       URL.revokeObjectURL(blobUrl);
     } catch {
       window.open(url, '_blank');
+    }
+  };
+  const handleAddToCart = async () => {
+    if (!product) return;
+    if (!user) {
+      toast({ title: "Please login first", description: "You need to be logged in.", variant: "destructive" });
+      navigate("/auth");
+      return;
+    }
+    const hasSkus = product.configuredItems && product.configuredItems.length > 0;
+    const totalQty = hasSkus ? Object.values(skuQuantities).reduce((a, b) => a + b, 0) : quantity;
+    if (totalQty <= 0) {
+      toast({ title: "Select quantity", description: "Please select at least 1 item.", variant: "destructive" });
+      return;
+    }
+    const totalPrice = hasSkus
+      ? product.configuredItems!.reduce((sum, sku) => sum + convertToBDT(sku.price) * (skuQuantities[sku.id] || 0), 0)
+      : convertToBDT(product.price) * quantity;
+    const unitPrice = Math.round(totalPrice / totalQty);
+
+    const calcDomesticCNY = domesticShippingFirst != null && domesticShippingFirst > 0
+      ? domesticShippingFirst + (totalQty > 1 ? (totalQty - 1) * (domesticShippingNext ?? domesticShippingFirst) : 0)
+      : 0;
+    const domesticChargeBDT = calcDomesticCNY > 0 ? Math.round(convertToBDT(calcDomesticCNY)) : 0;
+
+    const skuDetails = hasSkus
+      ? product.configuredItems!.filter(sku => (skuQuantities[sku.id] || 0) > 0).map(sku => ({
+          name: sku.title, qty: skuQuantities[sku.id], unitPrice: convertToBDT(sku.price),
+        }))
+      : [];
+
+    setAddingToCart(true);
+    try {
+      await addToCart({
+        product_id: String(product.num_iid),
+        product_name: product.title,
+        product_image: product.pic_url,
+        product_url: `${window.location.origin}/?product=${product.num_iid}`,
+        source_url: `https://detail.1688.com/offer/${product.num_iid}.html`,
+        variant_id: hasSkus ? product.configuredItems!.filter(sku => (skuQuantities[sku.id] || 0) > 0).map(s => s.id).join(", ") : null,
+        variant_name: hasSkus ? product.configuredItems!.filter(sku => (skuQuantities[sku.id] || 0) > 0).map(s => s.title).join(", ") : null,
+        unit_price: unitPrice,
+        quantity: totalQty,
+        domestic_shipping_fee: domesticChargeBDT,
+        seller_name: product.seller_info?.shop_name || null,
+        sku_details: skuDetails,
+      });
+      toast({ title: "কার্টে যোগ হয়েছে! ✓", description: `${totalQty}টি পণ্য কার্টে যোগ করা হয়েছে।` });
+    } catch {
+      toast({ title: "Error", description: "কার্টে যোগ করতে সমস্যা হয়েছে।", variant: "destructive" });
+    } finally {
+      setAddingToCart(false);
     }
   };
 
@@ -849,8 +904,8 @@ export default function ProductDetail({ product, isLoading, onBack }: ProductDet
                     <Button variant="outline" size="icon" className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl shrink-0" onClick={handleToggleWishlist} disabled={addingToWishlist}>
                       <Heart className={`h-4 w-4 sm:h-5 sm:w-5 ${isWishlisted ? 'fill-destructive text-destructive' : ''}`} />
                     </Button>
-                    <Button variant="outline" className="min-w-0 flex-1 basis-[calc(50%-2rem)] h-10 sm:h-11 rounded-xl font-semibold text-xs sm:text-sm px-2 sm:px-4" onClick={handleBuyNow}>
-                      <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-2 shrink-0" />Add to Cart
+                    <Button variant="outline" className="min-w-0 flex-1 basis-[calc(50%-2rem)] h-10 sm:h-11 rounded-xl font-semibold text-xs sm:text-sm px-2 sm:px-4" onClick={handleAddToCart} disabled={addingToCart}>
+                      {addingToCart ? <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-2 shrink-0 animate-spin" /> : <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-2 shrink-0" />}Add to Cart
                     </Button>
                     <Button className="min-w-0 flex-1 basis-[calc(50%-2rem)] h-10 sm:h-11 rounded-xl font-bold shadow-md text-xs sm:text-sm px-2 sm:px-4" onClick={handleBuyNow}>
                       <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-2 shrink-0" />

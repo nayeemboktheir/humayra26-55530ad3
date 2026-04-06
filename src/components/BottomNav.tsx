@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LayoutGrid, ShoppingCart, ClipboardList, MessageCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import {
   Sheet,
@@ -39,6 +40,7 @@ const BottomNav = () => {
   const location = useLocation();
   const { user } = useAuth();
   const { settings } = useAppSettings();
+  const { count: cartCount } = useCart();
   const [catOpen, setCatOpen] = useState(false);
 
   const handleCategorySelect = (query: string) => {
@@ -48,7 +50,7 @@ const BottomNav = () => {
 
   const items = [
     { label: "Category", icon: LayoutGrid, action: () => setCatOpen(true) },
-    { label: "Cart", icon: ShoppingCart, action: () => navigate(user ? "/dashboard/orders" : "/auth") },
+    { label: "Cart", icon: ShoppingCart, action: () => navigate(user ? "/dashboard/cart" : "/auth"), badge: cartCount },
     { label: "center", icon: null, action: () => navigate("/") },
     { label: "Orders", icon: ClipboardList, action: () => navigate(user ? "/dashboard/orders" : "/auth") },
     { label: "Chat", icon: MessageCircle, href: settings.whatsapp_number ? `https://wa.me/88${(settings.whatsapp_number || "").replace(/-/g, "")}` : undefined },
@@ -114,9 +116,16 @@ const BottomNav = () => {
               <button
                 key={item.label}
                 onClick={item.action}
-                className="flex flex-col items-center gap-0.5 min-w-[56px]"
+                className="flex flex-col items-center gap-0.5 min-w-[56px] relative"
               >
-                <Icon className="h-5 w-5 text-muted-foreground" />
+                <div className="relative">
+                  <Icon className="h-5 w-5 text-muted-foreground" />
+                  {(item as any).badge > 0 && (
+                    <span className="absolute -top-1.5 -right-2 bg-destructive text-destructive-foreground text-[9px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
+                      {(item as any).badge > 99 ? "99+" : (item as any).badge}
+                    </span>
+                  )}
+                </div>
                 <span className="text-[10px] text-muted-foreground font-medium">{item.label}</span>
               </button>
             );
