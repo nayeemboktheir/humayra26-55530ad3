@@ -147,6 +147,59 @@ export default function ProductDetail({ product, isLoading, onBack }: ProductDet
       window.open(url, '_blank');
     }
   };
+  const handleAddToCart = async () => {
+    if (!product) return;
+    if (!user) {
+      toast({ title: "Please login first", description: "You need to be logged in.", variant: "destructive" });
+      navigate("/auth");
+      return;
+    }
+    const hasSkus = product.configuredItems && product.configuredItems.length > 0;
+    const totalQty = hasSkus ? Object.values(skuQuantities).reduce((a, b) => a + b, 0) : quantity;
+    if (totalQty <= 0) {
+      toast({ title: "Select quantity", description: "Please select at least 1 item.", variant: "destructive" });
+      return;
+    }
+    const totalPrice = hasSkus
+      ? product.configuredItems!.reduce((sum, sku) => sum + convertToBDT(sku.price) * (skuQuantities[sku.id] || 0), 0)
+      : convertToBDT(product.price) * quantity;
+    const unitPrice = Math.round(totalPrice / totalQty);
+
+    const calcDomesticCNY = domesticShippingFirst != null && domesticShippingFirst > 0
+      ? domesticShippingFirst + (totalQty > 1 ? (totalQty - 1) * (domesticShippingNext ?? domesticShippingFirst) : 0)
+      : 0;
+    const domesticChargeBDT = calcDomesticCNY > 0 ? Math.round(convertToBDT(calcDomesticCNY)) : 0;
+
+    const skuDetails = hasSkus
+      ? product.configuredItems!.filter(sku => (skuQuantities[sku.id] || 0) > 0).map(sku => ({
+          name: sku.title, qty: skuQuantities[sku.id], unitPrice: convertToBDT(sku.price),
+        }))
+      : [];
+
+    setAddingToCart(true);
+    try {
+      await addToCart({
+        user_id: user.id,
+        product_id: String(product.num_iid),
+        product_name: product.title,
+        product_image: product.pic_url,
+        product_url: `${window.location.origin}/?product=${product.num_iid}`,
+        source_url: `https://detail.1688.com/offer/${product.num_iid}.html`,
+        variant_id: hasSkus ? product.configuredItems!.filter(sku => (skuQuantities[sku.id] || 0) > 0).map(s => s.id).join(", ") : null,
+        variant_name: hasSkus ? product.configuredItems!.filter(sku => (skuQuantities[sku.id] || 0) > 0).map(s => s.title).join(", ") : null,
+        unit_price: unitPrice,
+        quantity: totalQty,
+        domestic_shipping_fee: domesticChargeBDT,
+        seller_name: product.seller_info?.shop_name || null,
+        sku_details: skuDetails,
+      });
+      toast({ title: "কার্টে যোগ হয়েছে! ✓", description: `${totalQty}টি পণ্য কার্টে যোগ করা হয়েছে।` });
+    } catch {
+      toast({ title: "Error", description: "কার্টে যোগ করতে সমস্যা হয়েছে।", variant: "destructive" });
+    } finally {
+      setAddingToCart(false);
+    }
+  };
 
   const handleBuyNow = () => {
     if (!product) return;
