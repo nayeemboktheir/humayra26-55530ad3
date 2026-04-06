@@ -116,9 +116,16 @@ const BottomNav = () => {
               <button
                 key={item.label}
                 onClick={item.action}
-                className="flex flex-col items-center gap-0.5 min-w-[56px]"
+                className="flex flex-col items-center gap-0.5 min-w-[56px] relative"
               >
-                <Icon className="h-5 w-5 text-muted-foreground" />
+                <div className="relative">
+                  <Icon className="h-5 w-5 text-muted-foreground" />
+                  {(item as any).badge > 0 && (
+                    <span className="absolute -top-1.5 -right-2 bg-destructive text-destructive-foreground text-[9px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
+                      {(item as any).badge > 99 ? "99+" : (item as any).badge}
+                    </span>
+                  )}
+                </div>
                 <span className="text-[10px] text-muted-foreground font-medium">{item.label}</span>
               </button>
             );
