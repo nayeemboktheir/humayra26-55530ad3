@@ -179,7 +179,6 @@ export default function ProductDetail({ product, isLoading, onBack }: ProductDet
     setAddingToCart(true);
     try {
       await addToCart({
-        user_id: user.id,
         product_id: String(product.num_iid),
         product_name: product.title,
         product_image: product.pic_url,
