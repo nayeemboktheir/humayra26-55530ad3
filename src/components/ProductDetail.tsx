@@ -614,8 +614,10 @@ export default function ProductDetail({ product, isLoading, onBack }: ProductDet
                         return (
                           <button key={colorKey} onClick={() => {
                             setSelectedSkuId(firstSku.id);
+                            setShowVideo(false);
                             const imgIdx = images.findIndex(img => img === firstSku.imageUrl);
-                            if (imgIdx >= 0) { setSelectedImage(imgIdx); setShowVideo(false); }
+                            if (imgIdx >= 0) { setSelectedImage(imgIdx); setVariantOverrideImage(null); }
+                            else if (firstSku.imageUrl) { setVariantOverrideImage(firstSku.imageUrl); }
                           }}
                             className={`relative flex-shrink-0 w-[60px] h-[60px] rounded overflow-hidden border-2 transition-all ${
                               selectedColorKey === colorKey ? 'border-primary ring-2 ring-primary/20' : 'border-border hover:border-primary/40'
