@@ -498,9 +498,9 @@ export default function ProductDetail({ product, isLoading, onBack }: ProductDet
           <div className="flex gap-3 lg:col-span-1">
             <div className="hidden md:flex flex-col gap-2 overflow-y-auto max-h-[560px] scrollbar-hide">
               {images.map((img, idx) => (
-                <button key={idx} onClick={() => { setSelectedImage(idx); setShowVideo(false); }}
+                <button key={idx} onClick={() => { setSelectedImage(idx); setShowVideo(false); setVariantOverrideImage(null); }}
                   className={`flex-shrink-0 w-[72px] h-[72px] rounded-lg overflow-hidden border-2 transition-all ${
-                    selectedImage === idx && !showVideo ? "border-primary ring-2 ring-primary/20" : "border-border hover:border-primary/40"
+                    selectedImage === idx && !showVideo && !variantOverrideImage ? "border-primary ring-2 ring-primary/20" : "border-border hover:border-primary/40"
                   }`}>
                   <img src={img} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }} />
                 </button>
