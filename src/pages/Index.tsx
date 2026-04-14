@@ -132,7 +132,7 @@ const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const { settings } = useAppSettings();
-  
+  const { count: cartCount } = useCart();
   // Set dynamic exchange rate and markup from settings
   const rate = parseFloat(settings.cny_to_bdt_rate || "17.5");
   if (rate > 0) setCnyToBdtRate(rate);
