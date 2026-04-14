@@ -61,29 +61,19 @@ export default function Cart() {
       totalPrice,
       domesticShippingFeeBDT: totalDomestic,
       sellerName: items[0].seller_name,
-      onConfirm: async (opts: { deliveryOption: string; address: string; note: string; paymentOption: string }) => {
-        // Create orders for each cart item
+      onConfirm: async (opts: { address: string; paymentOption: string }) => {
         const grandTotal = totalPrice + totalDomestic;
-        const payableAmount = opts.paymentOption === "partial" ? Math.round(grandTotal * 0.7) : grandTotal;
         const invoiceNumber = `PS-${Date.now()}`;
 
         for (const item of items) {
           const orderNumber = `HT-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 5).toUpperCase()}`;
           const itemTotal = item.unit_price * item.quantity;
-          const itemPayable = opts.paymentOption === "partial" ? Math.round((itemTotal + (item.domestic_shipping_fee || 0)) * 0.7) : itemTotal + (item.domestic_shipping_fee || 0);
 
           let notes = "";
           if (item.sku_details && Array.isArray(item.sku_details) && item.sku_details.length > 0) {
             notes = item.sku_details.map((s: any) => `${s.name}: ${s.qty} pcs × ৳${s.unitPrice}`).join("\n");
           }
-          if (opts.note) notes += (notes ? "\n---\n" : "") + opts.note;
-
-          const deliveryInfo = `\n[Delivery: ${opts.deliveryOption === "courier" ? "By Courier" : "Warehouse Pickup"}]`;
-          if (opts.deliveryOption === "courier" && opts.address) {
-            notes += `${deliveryInfo}\n[Address: ${opts.address}]`;
-          } else {
-            notes += deliveryInfo;
-          }
+          notes += `\n[Address: ${opts.address}]`;
 
           const { error } = await supabase.from("orders").insert({
             user_id: user.id,
@@ -102,7 +92,7 @@ export default function Cart() {
             product_1688_id: item.product_id,
             status: "awaiting_payment",
             payment_status: "unpaid",
-            payment_amount: itemPayable,
+            payment_amount: itemTotal + (item.domestic_shipping_fee || 0),
             payment_invoice: invoiceNumber,
           } as any);
 
@@ -115,7 +105,7 @@ export default function Cart() {
 
         const { data: psData, error: psError } = await supabase.functions.invoke("paystation-init-payment", {
           body: {
-            amount: payableAmount,
+            amount: grandTotal,
             invoiceNumber,
             customerEmail: userEmail,
             callbackUrl,
@@ -127,9 +117,7 @@ export default function Cart() {
           return;
         }
 
-        // Clear cart after successful order creation
         await clearCart();
-
         window.location.href = psData.payment_url;
       },
     });
