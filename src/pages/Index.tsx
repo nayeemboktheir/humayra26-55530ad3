@@ -1397,8 +1397,11 @@ const SiteHeader = ({ query, setQuery, handleSearch, isLoading, handleImageButto
           <h1 className="text-xl font-bold text-primary">{settings?.site_name || "TradeOn Global"}</h1>
         </button>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => navigate("/dashboard/orders")} title="Orders">
+          <Button variant="ghost" size="icon" className="h-9 w-9 relative" onClick={() => navigate(user ? "/dashboard/cart" : "/auth")} title="Cart">
             <ShoppingCart className="h-5 w-5 text-foreground" />
+            {cartCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">{cartCount}</span>
+            )}
           </Button>
           <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => navigate("/dashboard/wishlist")} title="Wishlist">
             <Heart className="h-5 w-5 text-foreground" />
@@ -1448,7 +1451,12 @@ const SiteHeader = ({ query, setQuery, handleSearch, isLoading, handleImageButto
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={handleInstallClick} title="Install App"><Download className="h-5 w-5" /></Button>
             <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard/wishlist")} title="Wishlist"><Heart className="h-5 w-5" /></Button>
-            <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard/orders")} title="Orders"><ShoppingCart className="h-5 w-5" /></Button>
+            <Button variant="ghost" size="icon" className="relative" onClick={() => navigate(user ? "/dashboard/cart" : "/auth")} title="Cart">
+              <ShoppingCart className="h-5 w-5" />
+              {cartCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">{cartCount}</span>
+              )}
+            </Button>
             <Button variant="ghost" size="icon" onClick={() => navigate(user ? "/dashboard" : "/auth")} title={user ? "Dashboard" : "Sign In"}><User className="h-5 w-5" /></Button>
           </div>
         </div>
