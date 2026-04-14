@@ -62,6 +62,7 @@ export default function Cart() {
       domesticShippingFeeBDT: totalDomestic,
       sellerName: items[0].seller_name,
       onConfirm: async (opts: { address: string; paymentOption: string }) => {
+        const payableAmount = opts.paymentOption === "partial" ? Math.round((totalPrice + totalDomestic) * 0.7) : totalPrice + totalDomestic;
         const grandTotal = totalPrice + totalDomestic;
         const invoiceNumber = `PS-${Date.now()}`;
 
