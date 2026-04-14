@@ -1,4 +1,5 @@
 import { useState } from "react";
+import logoIcon from "@/assets/logo-icon.png";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LayoutGrid, ShoppingCart, ClipboardList, MessageCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
