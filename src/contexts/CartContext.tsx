@@ -64,7 +64,16 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const addToCart = async (item: Partial<CartItem> & { product_id: string; product_name: string }) => {
     if (!user) return;
-    await (supabase.from("cart_items" as any) as any).insert({ ...item, user_id: user.id });
+    // Check if same product+variant already in cart → increment quantity
+    const existing = items.find(
+      (i) => i.product_id === item.product_id && i.variant_id === (item.variant_id || null)
+    );
+    if (existing) {
+      const newQty = existing.quantity + (item.quantity || 1);
+      await (supabase.from("cart_items" as any) as any).update({ quantity: newQty }).eq("id", existing.id);
+    } else {
+      await (supabase.from("cart_items" as any) as any).insert({ ...item, user_id: user.id });
+    }
     await fetchCart();
   };
 
