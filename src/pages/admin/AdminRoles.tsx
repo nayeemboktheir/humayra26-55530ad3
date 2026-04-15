@@ -50,7 +50,7 @@ export default function AdminRoles() {
       onCreate={onCreate}
       createFields={[
         { key: "user_id", label: "User ID (UUID)", required: true },
-        { key: "role", label: "Role (admin/moderator/user)", required: true },
+        { key: "role", label: "Role (admin/moderator/employee/user)", required: true },
       ]}
     />
   );

@@ -400,6 +400,27 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          can_access: boolean
+          id: string
+          page_key: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          can_access?: boolean
+          id?: string
+          page_key: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          can_access?: boolean
+          id?: string
+          page_key?: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
       search_cache: {
         Row: {
           created_at: string
@@ -648,7 +669,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role: "admin" | "moderator" | "user" | "employee"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -776,7 +797,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: ["admin", "moderator", "user", "employee"],
     },
   },
 } as const
